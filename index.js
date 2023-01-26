@@ -30,6 +30,7 @@ const menu = () => {
     })
 }
 
+//Inquirer Prompts for adding Data
 const addDepartment = () => {
     return inquirer.prompt([
         {
@@ -65,23 +66,26 @@ const addEmployee = () => {
         {
             type: 'input',
             name: 'firstName',
-            message: 'What is this employees first name?'
+            message: "What is this employee's first name?"
 
         },
         {
             type: 'input',
             name: 'lastName',
-            message: 'What is this employees last name?'
+            message: "What is this employee's last name?",
         },
         {
             type: 'input',
             name: 'role',
-            message: 'What is this employees role?',
+            message: "What is this employee's role?",
         },
         {
             type: 'input',
             name: 'manager',
-            message: 'Who is this employees manager?',
+            message: "Who is this employee's manager?",
         }
     ])
 }
+
+
+menu;
