@@ -71,18 +71,18 @@ const menu = () => {
 };
 
 
-//ADD A DEPARTMENT
+//ADD NEW DEPARTMENT
 const addDepartment = () => {
     return inquirer.prompt([
         {
             type: 'input',
-            name: 'name',
+            name: 'title',
             message: 'What is the name of the new department?'
         }
     ])
     .then ((data) => {
         const sql = `INSERT INTO department (name) VALUES (?)`;
-        const params = data.name;
+        const params = data.title;
 
         db.query(sql, params, (err, res) => {
             if (err) throw err;
@@ -92,7 +92,7 @@ const addDepartment = () => {
     })
 }
 
-//ADD A ROLE
+//ADD NEW ROLE
 const addRole = () => {
     var departmentArray = [];
     const sql = `SELECT * FROM department`;
@@ -105,7 +105,7 @@ const addRole = () => {
         return inquirer.prompt([
             {
                 type: 'input',
-                name: 'name',
+                name: 'title',
                 message: 'What is the name of the new role?',
             },
             {
@@ -142,28 +142,66 @@ const addRole = () => {
 
 //ADD NEW EMPLOYEE
 const addEmployee = () => {
-    return inquirer.prompt([
-        {
-            type: 'input',
-            name: 'firstName',
-            message: "What is this employee's first name?"
+    var roleArray = [];
 
-        },
-        {
-            type: 'input',
-            name: 'lastName',
-            message: "What is this employee's last name?",
-        },
-        {
-            type: 'input',
-            name: 'role',
-            message: "What is this employee's role?",
-        },
-        {
-            type: 'input',
-            name: 'manager',
-            message: "Who is this employee's manager?",
+    const sql = `SELECT * FROM role`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            roleArray.push(res[i].title)
         }
-    ])
-    
-}
+
+        var managerArray = [];
+
+        const sql1 = `SELECT concat(first_name, ' ', last_name) AS managers FROM employee`;
+        db.query(sql1, (err, res) => {
+            if (err) throw err;
+            for (let x = 0; x < res.length; x++) {
+                managerArray.push(res[x].managers)
+            }
+
+            return inquirer.prompt([
+                {
+                    type: 'input',
+                    name: 'firstName',
+                    message: "What is this employee's first name?"
+
+                },
+                {
+                    type: 'input',
+                    name: 'lastName',
+                    message: "What is this employee's last name?",
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    message: "What is this employee's role?",
+                    choices: roleArray,
+                },
+                {
+                    type: 'list',
+                    name: 'manager',
+                    message: "Who is this employee's manager?",
+                    choices: managerArray,
+                }
+            ])
+            .then((data) => {
+                const sql2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}'AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
+                db.query(sql2, (err, res) => {
+                    if (err) throw err;
+                    var roleID = res[0].role_id;
+                    var managerID = res[0].manager_id
+
+                    const sql3 = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
+                    const params3 = [data.firstName, data.lastName, roleID, managerID]
+
+                    db.query(sql3, params3, (err, res) => {
+                        if (err) throw err;
+                    })
+                })
+                console.log('Added new employee to the database')
+                menu();
+            });
+        });
+    });
+};
