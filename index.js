@@ -18,7 +18,7 @@ const db = mysql.createConnection(
         host: '127.0.0.1',
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
+        database: 'company_db',
     },
     console.log('Connected to the company_db database.')
 );
@@ -40,8 +40,8 @@ const menu = () => {
                      'Exit']
         }
     ])
-    .then(answers => {
-        switch(answers.menuList) {
+    .then(data => {
+        switch(data.menuList) {
             case 'View all Departments':
                 //ADD CODE HERE
                 break;
@@ -64,44 +64,83 @@ const menu = () => {
                 //ADD CODE HERE
                 break;
             case 'Exit':
-                console.log("Employee Tracker Exited!");
+                console.log("Bye!");
                 process.exit(0);
         };
     });
 };
 
 
-//Inquirer Prompts for adding Data
+//ADD A DEPARTMENT
 const addDepartment = () => {
     return inquirer.prompt([
         {
             type: 'input',
             name: 'name',
-            message: 'What is the name of this department?'
+            message: 'What is the name of the new department?'
         }
     ])
+    .then ((data) => {
+        const sql = `INSERT INTO department (name) VALUES (?)`;
+        const params = data.name;
+
+        db.query(sql, params, (err, res) => {
+            if (err) throw err;
+        });
+        console.log('New department added to the database!');
+        menu();
+    })
 }
 
+//ADD A ROLE
 const addRole = () => {
-    return inquirer.prompt([
-        {
-            type: 'input',
-            name: 'name',
-            message: 'What is the name of this role?',
-        },
-        {
-            type: 'input',
-            name: 'salary',
-            message: 'What is the salary for this role?',
-        },
-        {
-            type: 'input',
-            name: 'department',
-            message: 'What department is this role a part of?'
+    var departmentArray = [];
+    const sql = `SELECT * FROM department`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            departmentArray.push(res[i].name)
         }
-    ])
-}
+    
+        return inquirer.prompt([
+            {
+                type: 'input',
+                name: 'name',
+                message: 'What is the name of the new role?',
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'What is the salary for this role?',
+            },
+            {
+                type: 'list',
+                name: 'department',
+                message: 'What department is this role a part of?',
+                choices: departmentArray,
+            }
+        ])
+        .then ((data) => {
+            const findID = `SELECT id FROM department WHERE name = '${data.department}`
 
+            db.query(findID, (err, res) => {
+                if (err) throw err;
+                var departmentID = res[0].id;
+
+                const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+                const params = [data.name, data.salary, departmentID];
+
+                db.query(sql, params, (err, res) => {
+                    if (err) throw err;
+                })
+            })
+            console.log('New Role added to the database!')
+            menu();
+        });
+    });
+};
+
+//ADD NEW EMPLOYEE
 const addEmployee = () => {
     return inquirer.prompt([
         {
@@ -126,4 +165,5 @@ const addEmployee = () => {
             message: "Who is this employee's manager?",
         }
     ])
+    
 }
