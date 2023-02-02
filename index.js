@@ -64,7 +64,7 @@ const menu = () => {
                 //ADD CODE HERE
                 break;
             case 'Exit':
-                console.log("Employee Tracker Exited!");
+                console.log("Bye!");
                 process.exit(0);
         };
     });
