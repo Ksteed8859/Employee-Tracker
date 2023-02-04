@@ -128,7 +128,7 @@ const addRole = () => {
                 var departmentID = res[0].id;
 
                 const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
-                const params = [data.name, data.salary, departmentID];
+                const params = [data.title, data.salary, departmentID];
 
                 db.query(sql, params, (err, res) => {
                     if (err) throw err;
