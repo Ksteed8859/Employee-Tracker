@@ -43,13 +43,13 @@ const menu = () => {
     .then(data => {
         switch(data.menuList) {
             case 'View all Departments':
-                //ADD CODE HERE
+                viewDepartments();
                 break;
             case 'View all Roles':
-                //ADD CODE HERE
+                viewRoles();
                 break;
             case 'View all Employees':
-                //ADD CODE HERE
+                viewEmployees();
                 break;
             case 'Add a Department':
                 addDepartment();
@@ -70,7 +70,37 @@ const menu = () => {
     });
 };
 
+//VIEW ALL DEPARTMENTS 
+const viewDepartments = () => {
+    const sql = `SELECT * FROM department`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+        console.log("Displaying all Departments")
+        console.table(res);
+        menu();
+    })
+}
 
+//VIEW ALL ROLES
+const viewRoles = () => {
+    const sql = `SELECT role.id, role.title, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+        console.log("Displaying all Roles")
+        console.table(res);
+        menu();
+    })
+}
+//VIEW ALL EMPLOYEES
+const viewEmployees = () => {
+    const sql = `SELECT A.id, A.first_name, A.last_name, role.title, department.name AS department, role.salary, concat(B.first_name, ' ', B.last_name) AS manager FROM employee A JOIN role ON A.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee B ON A.manager_id = B.id;`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+        console.log("Displaying all Employees")
+        console.table(res);
+        menu();
+    })
+}
 //ADD NEW DEPARTMENT
 const addDepartment = () => {
     return inquirer.prompt([
@@ -205,3 +235,6 @@ const addEmployee = () => {
         });
     });
 };
+
+
+menu();
