@@ -124,39 +124,38 @@ const addDepartment = () => {
 
 //ADD NEW ROLE
 const addRole = () => {
+
     var departmentArray = [];
 
     const sql = `SELECT * FROM department`;
-
     db.query(sql, (err, res) => {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
             departmentArray.push(res[i].department_name)
         }
 
-    
         return inquirer.prompt([
             {
                 type: 'input',
                 name: 'title',
-                message: 'What is the name of the new role?',
+                message: 'What is the name of the role?',
             },
             {
                 type: 'input',
                 name: 'salary',
-                message: 'What is the salary for this role?',
+                message: 'What is the salary of the role?'
             },
             {
                 type: 'list',
                 name: 'department',
-                message: 'What department is this role a part of?',
-                choices: departmentArray,
+                message: 'Which department does this role belong to?',
+                choices: departmentArray
             }
         ])
         .then ((data) => {
-            const findID = `SELECT id FROM department WHERE name = '${data.department}`
+            const sql1 = `SELECT id FROM department WHERE department_name = '${data.department}'`
 
-            db.query(findID, (err, res) => {
+            db.query(sql1, (err, res) => {
                 if (err) throw err;
                 var departmentID = res[0].id;
 
@@ -170,9 +169,9 @@ const addRole = () => {
             console.log('---NEW ROLE ADDED TO THE DATABASE---');
             menu();
         });
-        
     });
 };
+
 
 //ADD NEW EMPLOYEE
 const addEmployee = () => {
@@ -237,7 +236,7 @@ const addEmployee = () => {
                         if (err) throw err;
                     })
                 })
-                console.log(`---ADDED NEW EMPLOYEE TO THE DATABASE---`)
+                console.log("---ADDED NEW EMPLOYEE TO THE DATABASE---")
                 menu();
             });
         });
