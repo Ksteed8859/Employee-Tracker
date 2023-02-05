@@ -61,7 +61,7 @@ const menu = () => {
                 addEmployee();
                 break;
             case 'Update an Employee Role':
-                //ADD CODE HERE
+                updateEmployee();
                 break;
             case 'Exit':
                 console.log("Bye!");
@@ -170,6 +170,7 @@ const addRole = () => {
             console.log('---NEW ROLE ADDED TO THE DATABASE---');
             menu();
         });
+        
     });
 };
 
@@ -233,6 +234,57 @@ const addEmployee = () => {
                     })
                 })
                 console.log('---NEW EMPLOYEE ADDED TO THE DATABASE---')
+                menu();
+            });
+        });
+    });
+};
+
+//UPDATE AN EMPLOYEE
+updateEmployee = () => {
+    var employeeArray = [];
+
+    const sql = `SELECT concat(first_name, ' ', last_name) AS employees FROM employee`;
+    db.query(sql, (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            employeeArray.push(res[i].employees)
+        }
+
+        let roleArray = [];
+        const sql2 = `SELECT * FROM role`;
+        db.query(sql2, (err, res) => {
+            if (err) throw err;
+            for (let x = 0; x < res.length; x++) {
+                roleArray.push(res[x].title)
+            }
+            return inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'employee',
+                    message: "Which employee's role do you want to update?",
+                    choices: employeeArray
+                },
+                {
+                    type: 'list',
+                    name: 'role',
+                    message: "What role do you want to assign this employee",
+                    choices: roleArray
+                }
+            ])
+            .then((data) => {
+                const sql3 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, ' ', last_name) = '${data.employee};) AS employee_id;`
+                db.query(sql3, (err, res) => {
+                    if (err) throw err;
+                    var roleID = res[0].role_id;
+                    var employeeID = res[0].employee_id;
+
+                    const sql4 = `UPDATE employee SET role_id = ${roleID} WHERE id = ${employeeID}`;
+                    db.query(sql4, (err, res) => {
+                        if (err) throw err;
+                    });
+                })
+                console.log("---EMPLOYEE'S ROLE UPDATED---");
                 menu();
             });
         });
