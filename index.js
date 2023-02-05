@@ -75,7 +75,7 @@ const viewDepartments = () => {
     const sql = `SELECT * FROM department`;
     db.query(sql, (err, res) => {
         if (err) throw err;
-        console.log("Displaying all Departments")
+        console.log("---DISPLAYING ALL DEPARTMENTS---")
         console.table(res);
         menu();
     })
@@ -86,17 +86,17 @@ const viewRoles = () => {
     const sql = `SELECT role.id, role.title, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id`;
     db.query(sql, (err, res) => {
         if (err) throw err;
-        console.log("Displaying all Roles")
+        console.log("---DISPLAYING ALL ROLES---")
         console.table(res);
         menu();
     })
 }
 //VIEW ALL EMPLOYEES
 const viewEmployees = () => {
-    const sql = `SELECT A.id, A.first_name, A.last_name, role.title, department.name AS department, role.salary, concat(B.first_name, ' ', B.last_name) AS manager FROM employee A JOIN role ON A.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee B ON A.manager_id = B.id;`;
+    const sql = `SELECT A.id, A.first_name, A.last_name, role.title, department.department_name AS department, role.salary, concat(B.first_name, ' ', B.last_name) AS manager FROM employee A JOIN role ON A.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee B ON A.manager_id = B.id;`;
     db.query(sql, (err, res) => {
         if (err) throw err;
-        console.log("Displaying all Employees")
+        console.log("---DISPLAYING ALL EMPLOYEES---")
         console.table(res);
         menu();
     })
@@ -111,13 +111,13 @@ const addDepartment = () => {
         }
     ])
     .then ((data) => {
-        const sql = `INSERT INTO department (name) VALUES (?)`;
+        const sql = `INSERT INTO department (department_name) VALUES (?)`;
         const params = data.title;
 
         db.query(sql, params, (err, res) => {
             if (err) throw err;
         });
-        console.log('New department added to the database!');
+        console.log('---NEW DEPARTMENT ADDED TO THE DATABASE---');
         menu();
     })
 }
@@ -125,12 +125,15 @@ const addDepartment = () => {
 //ADD NEW ROLE
 const addRole = () => {
     var departmentArray = [];
+
     const sql = `SELECT * FROM department`;
+
     db.query(sql, (err, res) => {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
-            departmentArray.push(res[i].name)
+            departmentArray.push(res[i].department_name)
         }
+
     
         return inquirer.prompt([
             {
@@ -164,7 +167,7 @@ const addRole = () => {
                     if (err) throw err;
                 })
             })
-            console.log('New Role added to the database!')
+            console.log('---NEW ROLE ADDED TO THE DATABASE---');
             menu();
         });
     });
@@ -229,7 +232,7 @@ const addEmployee = () => {
                         if (err) throw err;
                     })
                 })
-                console.log('Added new employee to the database')
+                console.log('---NEW EMPLOYEE ADDED TO THE DATABASE---')
                 menu();
             });
         });

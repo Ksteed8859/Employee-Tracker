@@ -21,11 +21,11 @@ INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Ethan", "Holmes", 1, NULL),
        ("Dennis", "Marks", 2, 1),
        ("Elaine", "Harrison", 3, NULL),
-       ("Jason", "Wade", 4, 2),
+       ("Jason", "Wade", 4, 3),
        ("Annie", "Louve", 5, NULL),
-       ("Johanna", "Benson", 6, 3),
+       ("Johanna", "Benson", 6, 5),
        ("Damian", "Grant", 7, NULL),
-       ("Sam", "Strong", 8, 4),
+       ("Sam", "Strong", 8, 7),
        ("Lucy", "Martinez", 9, NULL),
-       ("Cory", "Homestead", 10, 5);
+       ("Cory", "Homestead", 10, 9);
        
