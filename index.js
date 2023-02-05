@@ -124,39 +124,38 @@ const addDepartment = () => {
 
 //ADD NEW ROLE
 const addRole = () => {
+
     var departmentArray = [];
 
     const sql = `SELECT * FROM department`;
-
     db.query(sql, (err, res) => {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
             departmentArray.push(res[i].department_name)
         }
 
-    
         return inquirer.prompt([
             {
                 type: 'input',
                 name: 'title',
-                message: 'What is the name of the new role?',
+                message: 'What is the name of the role?',
             },
             {
                 type: 'input',
                 name: 'salary',
-                message: 'What is the salary for this role?',
+                message: 'What is the salary of the role?'
             },
             {
                 type: 'list',
                 name: 'department',
-                message: 'What department is this role a part of?',
-                choices: departmentArray,
+                message: 'Which department does this role belong to?',
+                choices: departmentArray
             }
         ])
         .then ((data) => {
-            const findID = `SELECT id FROM department WHERE name = '${data.department}`
+            const sql1 = `SELECT id FROM department WHERE department_name = '${data.department}'`
 
-            db.query(findID, (err, res) => {
+            db.query(sql1, (err, res) => {
                 if (err) throw err;
                 var departmentID = res[0].id;
 
@@ -170,12 +169,13 @@ const addRole = () => {
             console.log('---NEW ROLE ADDED TO THE DATABASE---');
             menu();
         });
-        
     });
 };
 
+
 //ADD NEW EMPLOYEE
 const addEmployee = () => {
+
     var roleArray = [];
 
     const sql = `SELECT * FROM role`;
@@ -184,6 +184,7 @@ const addEmployee = () => {
         for (let i = 0; i < res.length; i++) {
             roleArray.push(res[i].title)
         }
+
 
         var managerArray = [];
 
@@ -194,46 +195,48 @@ const addEmployee = () => {
                 managerArray.push(res[x].managers)
             }
 
-            return inquirer.prompt([
+            inquirer .prompt ([
                 {
                     type: 'input',
-                    name: 'firstName',
+                    name: 'first_name',
                     message: "What is this employee's first name?"
-
                 },
                 {
                     type: 'input',
-                    name: 'lastName',
-                    message: "What is this employee's last name?",
+                    name: 'last_name',
+                    message: "What is this employee's last name?"
                 },
                 {
                     type: 'list',
                     name: 'role',
-                    message: "What is this employee's role?",
-                    choices: roleArray,
+                    message: "What is the employee's role?",
+                    choices: roleArray
                 },
                 {
                     type: 'list',
                     name: 'manager',
-                    message: "Who is this employee's manager?",
-                    choices: managerArray,
+                    message: "Who is the employee's manager?",
+                    choices: managerArray
                 }
             ])
-            .then((data) => {
-                const sql2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}'AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
+            .then ((data) => {
+
+                const sql2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
+
                 db.query(sql2, (err, res) => {
                     if (err) throw err;
                     var roleID = res[0].role_id;
                     var managerID = res[0].manager_id
 
+                    // Inputs the first name, last name, role id, and manager id
                     const sql3 = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
-                    const params3 = [data.firstName, data.lastName, roleID, managerID]
+                    const params3 = [data.first_name, data.last_name, roleID, managerID]
 
                     db.query(sql3, params3, (err, res) => {
                         if (err) throw err;
                     })
                 })
-                console.log('---NEW EMPLOYEE ADDED TO THE DATABASE---')
+                console.log("---ADDED NEW EMPLOYEE TO THE DATABASE---")
                 menu();
             });
         });
