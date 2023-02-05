@@ -176,6 +176,7 @@ const addRole = () => {
 
 //ADD NEW EMPLOYEE
 const addEmployee = () => {
+
     var roleArray = [];
 
     const sql = `SELECT * FROM role`;
@@ -184,6 +185,7 @@ const addEmployee = () => {
         for (let i = 0; i < res.length; i++) {
             roleArray.push(res[i].title)
         }
+
 
         var managerArray = [];
 
@@ -194,46 +196,48 @@ const addEmployee = () => {
                 managerArray.push(res[x].managers)
             }
 
-            return inquirer.prompt([
+            inquirer .prompt ([
                 {
                     type: 'input',
-                    name: 'firstName',
+                    name: 'first_name',
                     message: "What is this employee's first name?"
-
                 },
                 {
                     type: 'input',
-                    name: 'lastName',
-                    message: "What is this employee's last name?",
+                    name: 'last_name',
+                    message: "What is this employee's last name?"
                 },
                 {
                     type: 'list',
                     name: 'role',
-                    message: "What is this employee's role?",
-                    choices: roleArray,
+                    message: "What is the employee's role?",
+                    choices: roleArray
                 },
                 {
                     type: 'list',
                     name: 'manager',
-                    message: "Who is this employee's manager?",
-                    choices: managerArray,
+                    message: "Who is the employee's manager?",
+                    choices: managerArray
                 }
             ])
-            .then((data) => {
-                const sql2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}'AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
+            .then ((data) => {
+
+                const sql2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
+
                 db.query(sql2, (err, res) => {
                     if (err) throw err;
                     var roleID = res[0].role_id;
                     var managerID = res[0].manager_id
 
+                    // Inputs the first name, last name, role id, and manager id
                     const sql3 = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
-                    const params3 = [data.firstName, data.lastName, roleID, managerID]
+                    const params3 = [data.first_name, data.last_name, roleID, managerID]
 
                     db.query(sql3, params3, (err, res) => {
                         if (err) throw err;
                     })
                 })
-                console.log('---NEW EMPLOYEE ADDED TO THE DATABASE---')
+                console.log(`---ADDED NEW EMPLOYEE TO THE DATABASE---`)
                 menu();
             });
         });
