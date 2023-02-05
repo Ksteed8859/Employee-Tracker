@@ -9,9 +9,11 @@ Using the terminal, this application allows for users to view all the department
 1. To install all the node modules required for this project to work, type: 'npm i' into the terminal. 
 2. Users must create a .env file containing a DB_USER and DB_PASSWORD in order to connect to the database. The .env file should be set up as follows:
 
-DB_NAME='exampleDatabase_db'
-DB_USER='exampleName'
-DB_PASSWORD='examplePassword'
+DB_NAME='exampleDatabase_db',
+
+DB_USER='exampleName',
+
+DB_PASSWORD='examplePassword',
 
 ## Usage
 
