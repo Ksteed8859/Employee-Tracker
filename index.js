@@ -65,8 +65,8 @@ const menu = () => {
 
 //VIEW ALL DEPARTMENTS 
 const viewDepartments = () => {
-    const sql = `SELECT * FROM department`;
-    db.query(sql, (err, res) => {
+    const query = `SELECT * FROM department`;
+    db.query(query, (err, res) => {
         if (err) {
             console.log(err.message);
             return;
@@ -80,8 +80,8 @@ const viewDepartments = () => {
 
 //VIEW ALL ROLES
 const viewRoles = () => {
-    const sql = `SELECT role.id, role.title, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id`;
-    db.query(sql, (err, res) => {
+    const query = `SELECT role.id, role.title, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id`;
+    db.query(query, (err, res) => {
         if (err) {
             console.log(err.message);
             return;
@@ -94,8 +94,8 @@ const viewRoles = () => {
 }
 //VIEW ALL EMPLOYEES
 const viewEmployees = () => {
-    const sql = `SELECT A.id, A.first_name, A.last_name, role.title, department.department_name AS department, role.salary, concat(B.first_name, ' ', B.last_name) AS manager FROM employee A JOIN role ON A.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee B ON A.manager_id = B.id;`;
-    db.query(sql, (err, res) => {
+    const query = `SELECT A.id, A.first_name, A.last_name, role.title, department.department_name AS department, role.salary, concat(B.first_name, ' ', B.last_name) AS manager FROM employee A JOIN role ON A.role_id = role.id JOIN department ON role.department_id = department.id LEFT JOIN employee B ON A.manager_id = B.id;`;
+    db.query(query, (err, res) => {
         if (err) {
             console.log(err.message);
             return;
@@ -116,10 +116,10 @@ const addDepartment = () => {
         }
     ])
     .then ((data) => {
-        const sql = `INSERT INTO department (department_name) VALUES (?)`;
+        const query = `INSERT INTO department (department_name) VALUES (?)`;
         const params = data.title;
 
-        db.query(sql, params, (err, res) => {
+        db.query(query, params, (err, res) => {
             if (err) {
                 console.log(err.message);
                 return;
@@ -136,8 +136,8 @@ const addRole = () => {
 
     var departmentArray = [];
 
-    const sql = `SELECT * FROM department`;
-    db.query(sql, (err, res) => {
+    const query = `SELECT * FROM department`;
+    db.query(query, (err, res) => {
         if (err) {
             console.log(err.message);
             return;
@@ -165,19 +165,19 @@ const addRole = () => {
                 }
             ])
             .then ((data) => {
-                const sql1 = `SELECT id FROM department WHERE department_name = '${data.department}'`
+                const query1 = `SELECT id FROM department WHERE department_name = '${data.department}'`
 
-                db.query(sql1, (err, res) => {
+                db.query(query1, (err, res) => {
                     if (err) {
                         console.log(err.message);
                         return;
                     } else {
                         var departmentID = res[0].id;
 
-                        const sql2 = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+                        const query2 = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
                         const params = [data.title, data.salary, departmentID];
 
-                        db.query(sql2, params, (err, res) => {
+                        db.query(query2, params, (err, res) => {
                             if (err) {
                                 console.log(err.message);
                                 return;
@@ -200,8 +200,8 @@ const addEmployee = () => {
 
     var roleArray = [];
 
-    const sql = `SELECT * FROM role`;
-    db.query(sql, (err, res) => {
+    const query = `SELECT * FROM role`;
+    db.query(query, (err, res) => {
         if (err) {
             console.log(err.message);
             return;
@@ -213,8 +213,8 @@ const addEmployee = () => {
 
             var managerArray = [];
 
-            const sql1 = `SELECT concat(first_name, ' ', last_name) AS managers FROM employee`;
-            db.query(sql1, (err, res) => {
+            const query1 = `SELECT concat(first_name, ' ', last_name) AS managers FROM employee`;
+            db.query(query1, (err, res) => {
                 if (err) {
                     console.log(err.message);
                     return;
@@ -249,9 +249,9 @@ const addEmployee = () => {
                     ])
                     .then ((data) => {
 
-                        const sql2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
+                        const query2 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, " ", last_name) = '${data.manager}') AS manager_id;`
 
-                        db.query(sql2, (err, res) => {
+                        db.query(query2, (err, res) => {
                             if (err) {
                                 console.log(err.message);
                                 return;
@@ -259,10 +259,10 @@ const addEmployee = () => {
                                 var roleID = res[0].role_id;
                                 var managerID = res[0].manager_id
 
-                                const sql3 = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
+                                const query3 = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
                                 const params3 = [data.first_name, data.last_name, roleID, managerID]
 
-                                db.query(sql3, params3, (err, res) => {
+                                db.query(query3, params3, (err, res) => {
                                     if (err) {
                                         console.log(err.message);
                                         return;
@@ -284,26 +284,21 @@ const addEmployee = () => {
 //UPDATE AN EMPLOYEE
 updateEmployee = () => {
     var employeeArray = [];
+    let roleArray = [];
 
-    const sql = `SELECT concat(first_name, ' ', last_name) AS employees FROM employee`;
-    db.query(sql, (err, res) => {
-        if (err) {
-            console.log(err.message);
-            return;
-        } else {
-            for (let i = 0; i < res.length; i++) {
+    const query = `SELECT * FROM employee`;
+    db.query(query, (err, res) => {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
                 employeeArray.push(res[i].employees)
             }
 
-            let roleArray = [];
-            const sql2 = `SELECT * FROM role`;
-            db.query(sql2, (err, res) => {
-                if (err) {
-                    console.log(err.message);
-                    return;
-                } else {
-                    for (let x = 0; x < res.length; x++) {
-                        roleArray.push(res[x].title)
+            
+            const query2 = `SELECT * FROM role`;
+            db.query(query2, (err, res) => {
+                if (err) throw err
+                    for (let i = 0; i < res.length; i++) {
+                        roleArray.push(res[i].title)
                     }
                     return inquirer.prompt([
                         {
@@ -320,32 +315,26 @@ updateEmployee = () => {
                         }
                     ])
                     .then((data) => {
-                        const sql3 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, ' ', last_name) = '${data.employee};) AS employee_id;`
-                        db.query(sql3, (err, res) => {
-                            if (err) {
-                                console.log(err.message);
-                                return;
-                            } else {
+                        const query3 = `SELECT (SELECT role.id FROM role WHERE title = '${data.role}') AS role_id, (SELECT employee.id FROM employee WHERE concat(first_name, ' ', last_name) = '${data.employee};) AS employee_id;`
+                        db.query(query3, (err, res) => {
+                            if (err) throw err;
                                 var roleID = res[0].role_id;
                                 var employeeID = res[0].employee_id;
 
-                                const sql4 = `UPDATE employee SET role_id = ${roleID} WHERE id = ${employeeID}`;
-                                db.query(sql4, (err, res) => {
-                                    if (err) {
-                                        console.log(err.message);
-                                        return;
-                                    } else {
-                                        console.log("---EMPLOYEE'S ROLE UPDATED---");
-                                        menu();
-                                    } 
+                                const query4 = `UPDATE employee SET role_id = ${roleID} WHERE id = ${employeeID}`;
+                                db.query(query4, (err, res) => {
+                                    if (err) throw err;
+                                    console.log("---EMPLOYEE'S ROLE UPDATED---");
+                                    menu();
+                                    
                                 });
-                            }
+                            
                         })
                        
                     });
-                }
+                
             });
-        }
+        
     });
 };
 
